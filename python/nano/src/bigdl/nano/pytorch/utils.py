@@ -30,6 +30,7 @@ from bigdl.nano.deps.ipex.ipex_api import load_ipexjit_model, load_ipexjitbf16_m
 from bigdl.nano.deps.onnxruntime.onnxruntime_api import load_onnxruntime_model
 from bigdl.nano.deps.neural_compressor.inc_api import load_inc_model
 from bigdl.nano.pytorch.amp.amp_api import load_bf16_model
+from bigdl.nano.pytorch.low_precision.jit_int8_api import load_pytorchjitint8_model
 from bigdl.nano.utils.log4Error import invalidInputError
 from bigdl.nano.pytorch.context_manager import generate_context_manager
 from pathlib import Path
@@ -162,6 +163,8 @@ def load_model(path, model: pl.LightningModule = None, input_sample=None,
         return load_ipex_quantization_model(path, model, inplace=inplace)
     if model_type == 'BF16Model':
         return load_bf16_model(path, model)
+    if model_type == 'PytorchJITINT8Model':
+        return load_pytorchjitint8_model(path, model)
     if isinstance(model, nn.Module):
         # typically for models of nn.Module, pl.LightningModule type
         model = copy.deepcopy(model)
