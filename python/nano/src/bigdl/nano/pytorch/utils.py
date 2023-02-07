@@ -164,7 +164,7 @@ def load_model(path, model: pl.LightningModule = None, input_sample=None,
     if model_type == 'BF16Model':
         return load_bf16_model(path, model)
     if model_type == 'PytorchJITINT8Model':
-        return load_pytorchjitint8_model(path, model)
+        return load_pytorchjitint8_model(path)
     if isinstance(model, nn.Module):
         # typically for models of nn.Module, pl.LightningModule type
         model = copy.deepcopy(model)
