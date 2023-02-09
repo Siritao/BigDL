@@ -527,16 +527,16 @@ class InferenceOptimizer(BaseInferenceOptimizer):
                                 torch.nn.Module.
         :param precision:       Global precision of quantized model,
                                 supported type: 'int8', 'bf16', 'fp16', defaults to 'int8'.
-        :param accelerator:     Use accelerator 'None', 'onnxruntime', 'openvino', defaults to None.
-                                None means staying in pytorch.
+        :param accelerator:     Use accelerator 'None', 'onnxruntime', 'openvino', 'jit', defaults
+                                to None. None means staying in pytorch.
         :param calib_data:      Calibration data is required for static quantization.
                                 It's also used as validation dataloader.
                                 calib_data support following formats:
 
                                 | 1. a torch.utils.data.dataloader.DataLoader object for training.
                                 |
-                                | 2. a single torch.Tensor which used for training, this case is
-                                | used to accept single sample input x.
+                                | 2. a single torch.Tensor used for training, this case is used
+                                | to accept single sample input x.
                                 |
                                 | 3. a tuple of torch.Tensor which used for training, this case is
                                 | used to accept single sample input (x, y) or (x1, x2) et al.
@@ -639,16 +639,22 @@ class InferenceOptimizer(BaseInferenceOptimizer):
                               be ignored. For more details, please refer https://github.com/
                               pytorch/pytorch/tree/master/torch/csrc/jit/codegen/
                               onednn#pytorch---onednn-graph-api-bridge.
-        :param q_config: describes how to quantize a layer or a part of the network
-                         by providing settings (observer classes) for activations and weights
-                         respectively. Note that QConfig needs to contain observer classes
-                         (like MinMaxObserver) or a callable that returns instances on
-                         invocation, not the concrete observer instances themselves.
-                         Quantization preparation function will instantiate observers multiple
-                         times for each of the layers. For more details, please refer
-                         https://pytorch.org/docs/1.13/generated/torch.quantization.qconfig.
-                         QConfig.html#torch.quantization.qconfig.QConfig .
-                         This parameter only works for native ipex quantization.
+        :param q_config: Qconfig (https://pytorch.org/docs/stable/generated/torch.quantization.
+                         qconfig.QConfig.html#qconfig) describes how to quantize a layer or a part
+                         of the network by providing settings (observer classes) for activations
+                         and weights respectively. Note that QConfig needs to contain observer
+                         classes (like MinMaxObserver) or a callable that returns instances on
+                         invocation, not the concrete observer instances themselves. Quantization
+                         preparation function will instantiate observers multiple times for each
+                         of the layers.
+                         This parameter only works for native ipex and jit quantization with int8
+                         precision. When accelerator is 'jit', we support and recommend
+                         to directly pass a QConfigMapping (https://pytorch.org/docs/
+                         stable/generated/torch.ao.quantization.qconfig_mapping.
+                         QConfigMapping.html#qconfigmapping). QConfigMapping is a collection of
+                         quantization configurations, user can set the qconfig for each operator
+                         (torch op calls, functional calls, module calls) in the model through
+                         qconfig_mapping.
         :param **kwargs: Other extra advanced settings include:
                          1. those be passed to ``torch.onnx.export`` function,
                          only valid when accelerator='onnxruntime'/'openvino',
