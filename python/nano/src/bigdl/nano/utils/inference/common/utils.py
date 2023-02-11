@@ -23,7 +23,7 @@ from abc import abstractmethod
 
 
 _whole_acceleration_options = ["inc", "ipex", "onnxruntime", "openvino", "pot",
-                               "bf16", "jit", "channels_last"]
+                               "bf16", "jit", "fx", "channels_last"]
 
 CompareMetric = namedtuple("CompareMetric", ["method_name", "latency", "accuracy"])
 
@@ -40,7 +40,7 @@ class AccelerationOption(object):
         self.method = kwargs.get("method", None)
 
     def get_precision(self):
-        if self.inc or self.pot:
+        if self.inc or self.pot or self.fx:
             return "int8"
         if self.bf16:
             return "bf16"
